@@ -610,6 +610,28 @@ class Team(YahooFantasyObject):
         self.user_profile_image: str = self._extracted_data.get("user_profile_image", "")
         self.waiver_priority: Optional[int] = self._extracted_data.get("waiver_priority", None)
         self.win_probability: float = self._get_nested_value(self._extracted_data, "win_probability", 0.0, float)
+        self.team_stats: TeamStats = self._extracted_data.get("team_stats", TeamStats({}))
+
+
+class TeamStats(YahooFantasyObject):
+    """Model class for "team_stats" data key.
+    """
+
+    def __init__(self, extracted_data):
+        """Instantiate the TeamStats child class of YahooFantasyObject.
+
+        Args:
+            extracted_data (dict): Parsed and cleaned JSON data retrieved from the Yahoo Fantasy Sports REST API.
+
+        Attributes:
+            coverage_type (str): The timeframe for the selected team points ("week", "date", "season", etc.).
+            week (int): The week number (if applicable).
+            stats (list): List of stats objects
+        """
+        YahooFantasyObject.__init__(self, extracted_data)
+        self.coverage_type: str = self._extracted_data.get("coverage_type", "")
+        self.week: int = self._extracted_data.get("week", None)
+        self.stats: List[Stat] = self._extracted_data.get("stats", [])
 
 
 # noinspection PyUnresolvedReferences
@@ -1341,6 +1363,7 @@ class Matchup(YahooFantasyObject):
         self.week_end: str = self._extracted_data.get("week_end", "")
         self.week_start: str = self._extracted_data.get("week_start", "")
         self.winner_team_key: str = self._extracted_data.get("winner_team_key", "")
+        self.stat_winners: List[str] = self._extracted_data.get("stats", "")
 
 
 # noinspection PyUnresolvedReferences
