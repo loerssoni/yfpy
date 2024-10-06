@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 import setuptools
-from ruamel.yaml import YAML
+from ruamel_yaml import YAML
 
 from VERSION_PYTHON import __version_minimum_python__, __version_maximum_python__
 
