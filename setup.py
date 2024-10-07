@@ -4,7 +4,6 @@ import subprocess
 from pathlib import Path
 
 import setuptools
-from ruamel_yaml import YAML
 
 from VERSION_PYTHON import __version_minimum_python__, __version_maximum_python__
 
@@ -53,40 +52,6 @@ supported_python_minor_versions = [
     version for version in
     range(int(__version_minimum_python__.split(".")[-1]), (int(__version_maximum_python__.split(".")[-1]) + 1))
 ]
-
-docker_compose_yaml_file = project_root_dir / "compose.yaml"
-if docker_compose_yaml_file.exists():
-    print("Updating \"compose.yaml\" with YFPY version from git tag before packaging...")
-
-    yaml = YAML(typ="rt")
-    docker_compose_yaml = yaml.load(docker_compose_yaml_file)
-    docker_compose_yaml["services"]["package"]["image"] = (
-        f"{docker_compose_yaml['services']['package']['image'].split(':')[0]}:{git_version.replace('v', '')}"
-    )
-
-    yaml.default_flow_style = False
-    yaml.dump(docker_compose_yaml, docker_compose_yaml_file)
-
-docker_compose_build_yaml_file = project_root_dir / "compose.build.yaml"
-if docker_compose_build_yaml_file.exists():
-    print("Updating \"compose.build.yaml\" with Python version from .env before packaging...")
-
-    yaml = YAML(typ="rt")
-    docker_compose_build_yaml = yaml.load(docker_compose_build_yaml_file)
-
-    updated_build_args = []
-    for build_arg in docker_compose_build_yaml["services"]["package"]["build"]["args"]:
-        build_arg_key, build_arg_value = build_arg.split("=")
-        if build_arg_key == "PYTHON_VERSION_MAJOR":
-            build_arg_value = supported_python_major_versions[0]
-        elif build_arg_key == "PYTHON_VERSION_MINOR":
-            build_arg_value = supported_python_minor_versions[-1]
-        updated_build_args.append(f"{build_arg_key}={build_arg_value}")
-    docker_compose_build_yaml["services"]["package"]["build"]["args"] = updated_build_args
-
-    yaml.default_flow_style = False
-    yaml.dump(docker_compose_build_yaml, docker_compose_build_yaml_file)
-
 setuptools.setup(
     name="yfpy",
     version=pypi_version,
